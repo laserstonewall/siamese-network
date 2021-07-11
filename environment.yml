@@ -1,0 +1,18 @@
+name: siamese
+channels:
+  - defaults
+  - pytorch
+  - fastai
+dependencies:
+  - pytorch=1.9.0
+  - torchvision 
+  - torchaudio 
+  - cudatoolkit=10.2 
+  - fastai=1.0.61
+  - ipython=7.1.1
+  - prompt_toolkit==2.0.10
+  - notebook
+  - jupyter
+  - jupyter_contrib_nbextensions
+  - scikit-learn=0.24.2
+
