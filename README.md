@@ -14,7 +14,38 @@ A sample workflow is contained in `nbs/Oxford-IIIT_Pet.ipynb`
 
 ### Installation
 
-#### Create a new environment with required packages
+First run:
+
+```bash
+git clone https://github.com/laserstonewall/siamese-network
+```
+
+to pull the repository locally. Then either build and run the provided Docker container, or install directly on your development machine.
+
+#### Build and run the provided Docker container
+
+If you haven't already, [install Docker](https://docs.docker.com/get-docker/) on your system, and then also install the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker) following the instructions for Docker.
+
+Once Docker and the NVIDIA Container Toolkit are installed, from the `siamese-network` main directory, run:
+
+```bash
+docker build --build-arg CUDA_VERSION=XXX -t nvidia_siamese:latest .
+```
+substituting in your version of CUDA for XXX. If you are unsure of your CUDA version, run `nvidia-smi` and it will tell you your CUDA version in the upper right. For example, if you have `CUDA Version: 10.2` the command is:
+
+```bash
+docker build --build-arg CUDA_VERSION=10.2 -t nvidia_siamese:latest .
+```
+
+The container will take several minutes to build. Once complete, the container can be started, with full GPU support and a running Jupyter notebook with the Oxford Pets example notebook with:
+
+```bash
+docker run -it --shm-size=2g -m=4g -p 9183:9183 --runtime=nvidia -e NVIDIA_DRIVER_CAPABILITIES=compute,utility -e NVIDIA_VISIBLE_DEVICES=all nvidia_siamese /bin/bash -c "source activate siamese && jupyter notebook --no-browser --port=9183 --ip=0.0.0.0 --allow-root"
+```
+
+Once started, the Jupyter notebook will display a URL + token, copy this and paste into the browser on your local development machine, and you should be 
+
+#### Local installation: Create a new environment with required packages
 
 To create an environment with all required packages capable of running the example notebook, use the provided `environment.yml` file to install a `conda` environment with the needed packages, including the `siamese` package contained in this repo:
 
@@ -28,7 +59,7 @@ Then run:
 conda activate siamese
 ```
 
-#### Install into existing `conda` environment
+#### Local Installation: Install into existing `conda` environment
 
 The only dependency for the core functionality of `siamese` are the `SiamesePairedDataset` and `SiameseNetwork` classes. These work directly in `PyTorch`, and can be imported and used as any normal `Dataset` and network would be. To install these directly to your existing environment, from the main project directory run:
 
