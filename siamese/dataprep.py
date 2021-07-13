@@ -8,6 +8,53 @@ import torch
 from torch.utils.data import Dataset
 
 class SiamesePairedDataset(Dataset):
+    """As implemented here, Siamese networks take in pairs of images, 
+    and output a label predicting whether the image pair is from the same 
+    class or different classes. `SiamesePairedDataset` inherits from the base 
+    PyTorch `Dataset` class, adding specific functionality to generate image 
+    pairs and the sameness/difference label.
+
+    In order to use it, you'll need a `pandas` DataFrame with two columns to 
+    input to `SiamesePairedDataset`:
+
+    1. A column containing the full path to the individual images.
+    2. A column indicating the class the image belongs to.
+
+    For example, the `data` folder is two levels up from your current directory, 
+    you might end up with:
+
+    | Image                                      | Label |
+    | ------------------------------------------ | :---: |
+    | ../../data/images/Abyssinian_100.jpg       |   1   |
+    | ../../data/images/Abyssinian_100.jpg       |   1   |
+    | ...                                        |       |
+    | ../../data/images/yorkshire_terrier_99.jpg |   37  |
+    | ../../data/images/yorkshire_terrier_9.jpg  |   37  |
+
+    **Inputs**
+
+    - **data**: The `pandas` DataFrame with columns for image path and class described above.
+
+    - **path_col**: The column name in `data` DataFrame containing the image paths.
+
+    - **label_col**: The column name in `data` DataFrame containing the image class labels.
+    
+    - **sampling_strategy**: How classes will be sampled to generate image pairs. If `'uniform'` 
+    all classes will be sampled with equal probability, regardless of the relative number of 
+    examples of each class. If `'proportional'` all classes will sampled according to their 
+    prevalence in the data. If `'custom'`, the probability of sampling each class must be specified 
+    according to the documentation below for the `class_prob` kwarg. 
+    
+    - **class_prob**: Unless `sampling_strategy` is `'custom'` this should be `None`. If `'custom'` 
+    is used, this should be an array where each value corresponds to the class sampling probability, 
+    where the order of the classes is determined by the order of `data[label_col].unique()`.
+
+    - **transform**: The set of PyTorch transforms to use on the images for image augmentation. 
+    Should be assembled using PyTorch's `transforms.Compose` function. The pre-trained ResNets 
+    from PyTorch used here function best when their inputs are in the same range they were trained 
+    on, `[-1, 1]`. To ensure this is the case, it's often a good idea to have 
+    `transforms.Lambda(lambda x: (x - 0.5) / 0.5)` as the final transform in your `Compose` statement."""
+    
     def __init__(self, 
                  data, 
                  path_col=None, 
